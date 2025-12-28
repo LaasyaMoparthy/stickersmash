@@ -3,8 +3,19 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import Constants from 'expo-constants';
 import 'react-native-url-polyfill/auto';
 
-const supabaseUrl = Constants.expoConfig?.extra?.supabaseUrl || process.env.EXPO_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = Constants.expoConfig?.extra?.supabaseAnonKey || process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
+// Load environment variables from .env file (via babel-plugin-inline-dotenv)
+// Or from app.json extra field, or from process.env
+const supabaseUrl = 
+  Constants.expoConfig?.extra?.supabaseUrl || 
+  process.env.EXPO_PUBLIC_SUPABASE_URL || 
+  process.env.SUPABASE_URL || 
+  '';
+
+const supabaseAnonKey = 
+  Constants.expoConfig?.extra?.supabaseAnonKey || 
+  process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 
+  process.env.SUPABASE_ANON_KEY || 
+  '';
 
 // Create Supabase client only if credentials are provided
 // This allows the app to run without crashing during development
