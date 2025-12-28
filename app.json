@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "StickerSmash",
-    "slug": "StickerSmash",
+    "name": "GoalStakes",
+    "slug": "goalstakes",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "stickersmash",
+    "scheme": "goalstakes",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
