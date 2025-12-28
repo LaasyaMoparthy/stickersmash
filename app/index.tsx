@@ -22,11 +22,11 @@ export default function Index() {
             supabase.auth.getSession().then(({ data: { session } }) => {
               if (!hasNavigated) {
                 setHasNavigated(true);
-                if (session) {
-                  router.replace('/(tabs)');
-                } else {
-                  router.replace('/landing');
-                }
+              if (session) {
+                router.replace('/home');
+              } else {
+                router.replace('/landing');
+              }
               }
             }).catch(() => {
               if (!hasNavigated) {

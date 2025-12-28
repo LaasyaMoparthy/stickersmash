@@ -1,18 +1,20 @@
 // Database helper functions for Goal Accountability App
 import type {
-    AlarmClock,
-    AlarmClockInsert,
-    AlarmClockUpdate,
-    Friendship,
-    Goal,
-    GoalCollaboration,
-    GoalInsert,
-    GoalUpdate,
-    Profile,
-    Task,
-    TaskInsert,
-    Transaction,
-    Verification
+  AlarmClock,
+  AlarmClockInsert,
+  AlarmClockUpdate,
+  AppUsageLog,
+  Friendship,
+  Goal,
+  GoalCollaboration,
+  GoalInsert,
+  GoalUpdate,
+  LockedApp,
+  Profile,
+  Task,
+  TaskInsert,
+  Transaction,
+  Verification
 } from './database.types';
 import { supabase } from './supabase';
 
@@ -338,5 +340,105 @@ export async function stakeOnGoal(userId: string, goalId: string, amount: number
     });
 
   if (txError) throw txError;
+}
+
+// Locked Apps Functions
+export async function createLockedApp(
+  userId: string,
+  appName: string,
+  appPackage: string,
+  appIconUrl: string | null = null,
+  penaltyAmount: number = 0,
+  unlockCode: string | null = null
+): Promise<LockedApp> {
+  if (!supabase) throw new Error('Supabase is not configured');
+  
+  const { data, error } = await supabase
+    .from('locked_apps')
+    .insert({
+      user_id: userId,
+      app_name: appName,
+      app_package: appPackage,
+      app_icon_url: appIconUrl,
+      is_locked: true,
+      penalty_amount: penaltyAmount,
+      unlock_code: unlockCode,
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function getLockedApps(userId: string, lockedOnly = false): Promise<LockedApp[]> {
+  if (!supabase) throw new Error('Supabase is not configured');
+  
+  let query = supabase
+    .from('locked_apps')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (lockedOnly) {
+    query = query.eq('is_locked', true);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data || [];
+}
+
+export async function updateLockedApp(
+  appId: string,
+  updates: Partial<LockedApp>
+): Promise<LockedApp> {
+  if (!supabase) throw new Error('Supabase is not configured');
+  
+  const { data, error } = await supabase
+    .from('locked_apps')
+    .update(updates)
+    .eq('id', appId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteLockedApp(appId: string): Promise<void> {
+  if (!supabase) throw new Error('Supabase is not configured');
+  
+  const { error } = await supabase
+    .from('locked_apps')
+    .delete()
+    .eq('id', appId);
+
+  if (error) throw error;
+}
+
+export async function logAppUsage(
+  userId: string,
+  lockedAppId: string,
+  wasLocked: boolean,
+  penaltyApplied: number = 0,
+  unlockMethod: string | null = null
+): Promise<AppUsageLog> {
+  if (!supabase) throw new Error('Supabase is not configured');
+  
+  const { data, error } = await supabase
+    .from('app_usage_logs')
+    .insert({
+      user_id: userId,
+      locked_app_id: lockedAppId,
+      was_locked: wasLocked,
+      penalty_applied: penaltyApplied,
+      unlock_method: unlockMethod,
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
 }
 

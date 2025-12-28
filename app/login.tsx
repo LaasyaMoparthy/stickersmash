@@ -17,28 +17,17 @@ import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { supabase } from '@/lib/supabase';
 
-export default function SignupScreen() {
+export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   const primaryButtonTextColor = colorScheme === 'dark' ? colors.background : '#fff';
 
-  const handleSignup = async () => {
-    if (!email || !password || !confirmPassword) {
+  const handleLogin = async () => {
+    if (!email || !password) {
       Alert.alert('Error', 'Please fill in all fields');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
-      return;
-    }
-
-    if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters');
       return;
     }
 
@@ -49,25 +38,18 @@ export default function SignupScreen() {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
 
-      Alert.alert(
-        'Success',
-        'Account created! Please check your email to verify your account.',
-        [
-          {
-            text: 'OK',
-            onPress: () => router.replace('/login' as any),
-          },
-        ]
-      );
+      if (data.session) {
+        router.replace('/home');
+      }
     } catch (error: any) {
-      Alert.alert('Signup Failed', error.message || 'An error occurred during signup');
+      Alert.alert('Login Failed', error.message || 'An error occurred during login');
     } finally {
       setLoading(false);
     }
@@ -83,10 +65,10 @@ export default function SignupScreen() {
         <ThemedView style={styles.content}>
           <ThemedView style={styles.header}>
             <ThemedText type="title" style={styles.title}>
-              Create Account
+              Welcome Back
             </ThemedText>
             <ThemedText style={styles.subtitle}>
-              Join GoalStakes and start achieving your goals
+              Sign in to continue to GoalStakes
             </ThemedText>
           </ThemedView>
 
@@ -124,35 +106,13 @@ export default function SignupScreen() {
                     backgroundColor: colorScheme === 'dark' ? '#1a1a1a' : '#f5f5f5',
                   },
                 ]}
-                placeholder="Create a password (min. 6 characters)"
+                placeholder="Enter your password"
                 placeholderTextColor={colors.icon}
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
                 autoCapitalize="none"
-                autoComplete="password-new"
-                editable={!loading}
-              />
-            </ThemedView>
-
-            <ThemedView style={styles.inputContainer}>
-              <ThemedText style={styles.label}>Confirm Password</ThemedText>
-              <TextInput
-                style={[
-                  styles.input,
-                  {
-                    color: colors.text,
-                    borderColor: colors.icon,
-                    backgroundColor: colorScheme === 'dark' ? '#1a1a1a' : '#f5f5f5',
-                  },
-                ]}
-                placeholder="Confirm your password"
-                placeholderTextColor={colors.icon}
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                secureTextEntry
-                autoCapitalize="none"
-                autoComplete="password-new"
+                autoComplete="password"
                 editable={!loading}
               />
             </ThemedView>
@@ -160,32 +120,32 @@ export default function SignupScreen() {
             <TouchableOpacity
               style={[
                 styles.button,
-                { backgroundColor: colors.tint },
+                { backgroundColor: '#003366' },
                 loading && styles.buttonDisabled,
               ]}
-              onPress={handleSignup}
+              onPress={handleLogin}
               disabled={loading}>
               {loading ? (
-                <ActivityIndicator color={primaryButtonTextColor} />
+                <ActivityIndicator color="#FFFFFF" />
               ) : (
-                <ThemedText style={[styles.buttonText, { color: primaryButtonTextColor }]}>
-                  Create Account
+                <ThemedText style={[styles.buttonText, { color: '#FFFFFF' }]}>
+                  Sign In
                 </ThemedText>
               )}
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.linkButton}
-              onPress={() => router.push('/login' as any)}
+              onPress={() => router.push('/signup' as any)}
               disabled={loading}>
               <ThemedText style={styles.linkText}>
-                Already have an account?{' '}
+                Don't have an account?{' '}
                 <ThemedText style={[styles.linkText, { color: colors.tint }]}>
-                  Sign In
+                  Sign Up
                 </ThemedText>
               </ThemedText>
             </TouchableOpacity>
-
+            
             <TouchableOpacity
               style={styles.linkButton}
               onPress={() => router.back()}
@@ -263,3 +223,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
+

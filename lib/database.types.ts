@@ -20,7 +20,8 @@ export type TransactionType =
   | 'penalty'
   | 'reward'
   | 'refund'
-  | 'payout';
+  | 'payout'
+  | 'screen_time_penalty';
 
 export type VerificationType = 
   | 'photo'
@@ -140,6 +141,51 @@ export interface Transaction {
   created_at: string;
 }
 
+export interface ScreenTimeLimit {
+  id: string;
+  user_id: string;
+  daily_limit_minutes: number;
+  penalty_amount: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ScreenTimeLog {
+  id: string;
+  user_id: string;
+  date: string; // Date format YYYY-MM-DD
+  minutes_used: number;
+  limit_exceeded: boolean;
+  penalty_applied: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface LockedApp {
+  id: string;
+  user_id: string;
+  app_name: string;
+  app_package: string; // Package/bundle ID
+  app_icon_url: string | null;
+  is_locked: boolean;
+  unlock_code: string | null;
+  penalty_amount: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AppUsageLog {
+  id: string;
+  user_id: string;
+  locked_app_id: string;
+  accessed_at: string;
+  was_locked: boolean;
+  penalty_applied: number;
+  unlock_method: string | null;
+  created_at: string;
+}
+
 // Helper types for creating/updating
 export type GoalInsert = Omit<Goal, 'id' | 'created_at' | 'updated_at'>;
 export type GoalUpdate = Partial<Omit<Goal, 'id' | 'user_id' | 'created_at' | 'updated_at'>>;
@@ -149,4 +195,15 @@ export type AlarmClockUpdate = Partial<Omit<AlarmClock, 'id' | 'user_id' | 'crea
 
 export type TaskInsert = Omit<Task, 'id' | 'created_at' | 'updated_at' | 'is_completed' | 'completed_at'>;
 export type TaskUpdate = Partial<Omit<Task, 'id' | 'user_id' | 'created_at' | 'updated_at'>>;
+
+export type ScreenTimeLimitInsert = Omit<ScreenTimeLimit, 'id' | 'created_at' | 'updated_at'>;
+export type ScreenTimeLimitUpdate = Partial<Omit<ScreenTimeLimit, 'id' | 'user_id' | 'created_at' | 'updated_at'>>;
+
+export type ScreenTimeLogInsert = Omit<ScreenTimeLog, 'id' | 'created_at' | 'updated_at'>;
+export type ScreenTimeLogUpdate = Partial<Omit<ScreenTimeLog, 'id' | 'user_id' | 'created_at' | 'updated_at'>>;
+
+export type LockedAppInsert = Omit<LockedApp, 'id' | 'created_at' | 'updated_at'>;
+export type LockedAppUpdate = Partial<Omit<LockedApp, 'id' | 'user_id' | 'created_at' | 'updated_at'>>;
+
+export type AppUsageLogInsert = Omit<AppUsageLog, 'id' | 'created_at'>;
 
