@@ -23,6 +23,7 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
+  const primaryButtonTextColor = colorScheme === 'dark' ? colors.background : '#fff';
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -30,16 +31,21 @@ export default function LoginScreen() {
       return;
     }
 
+    if (!supabase) {
+      Alert.alert('Error', 'Supabase is not configured. Please set your environment variables.');
+      return;
+    }
+
     setLoading(true);
     try {
-      const { data, error } = await supabase?.auth.signInWithPassword?. ({  
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
-      }) ?? { data: null, error: null };
+      });
 
-      if (error ?? false) throw error;
+      if (error) throw error;
 
-      if (data?.session ?? false) {
+      if (data.session) {
         router.replace('/(tabs)');
       }
     } catch (error: any) {
@@ -120,9 +126,9 @@ export default function LoginScreen() {
               onPress={handleLogin}
               disabled={loading}>
               {loading ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color={primaryButtonTextColor} />
               ) : (
-                <ThemedText style={[styles.buttonText, { color: '#fff' }]}>
+                <ThemedText style={[styles.buttonText, { color: primaryButtonTextColor }]}>
                   Sign In
                 </ThemedText>
               )}
@@ -139,7 +145,7 @@ export default function LoginScreen() {
                 </ThemedText>
               </ThemedText>
             </TouchableOpacity>
-
+            
             <TouchableOpacity
               style={styles.linkButton}
               onPress={() => router.back()}
@@ -217,4 +223,3 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
-

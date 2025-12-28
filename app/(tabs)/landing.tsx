@@ -11,13 +11,16 @@ import { supabase } from '@/lib/supabase';
 export default function LandingScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
+  const primaryButtonTextColor = colorScheme === 'dark' ? colors.background : '#fff';
 
   useEffect(() => {
     // Check if user is already logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase?.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         router.replace('/(tabs)');
       }
+    }).catch(() => {
+      // Ignore errors if Supabase is not configured
     });
   }, []);
 
@@ -45,7 +48,7 @@ export default function LandingScreen() {
           <Link href="/login" asChild>
             <TouchableOpacity
               style={[styles.primaryButton, { backgroundColor: colors.tint }]}>
-              <ThemedText style={[styles.buttonText, { color: '#fff' }]}>
+              <ThemedText style={[styles.buttonText, { color: primaryButtonTextColor }]}>
                 Sign In
               </ThemedText>
             </TouchableOpacity>
@@ -126,4 +129,3 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
 });
-

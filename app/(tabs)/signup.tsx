@@ -24,6 +24,7 @@ export default function SignupScreen() {
   const [loading, setLoading] = useState(false);
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
+  const primaryButtonTextColor = colorScheme === 'dark' ? colors.background : '#fff';
 
   const handleSignup = async () => {
     if (!email || !password || !confirmPassword) {
@@ -41,16 +42,20 @@ export default function SignupScreen() {
       return;
     }
 
+    if (!supabase) {
+      Alert.alert('Error', 'Supabase is not configured. Please set your environment variables.');
+      return;
+    }
+
     setLoading(true);
     try {
-      const { data, error } = await supabase?.auth.signUp?. ({  
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
-      }) ?? { data: null, error: null };
-      if (error ?? false) throw error;  
-      if (data?.session ?? false) {
-        router.replace('/(tabs)');
-      }
+      });
+
+      if (error) throw error;
+
       Alert.alert(
         'Success',
         'Account created! Please check your email to verify your account.',
@@ -161,9 +166,9 @@ export default function SignupScreen() {
               onPress={handleSignup}
               disabled={loading}>
               {loading ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color={primaryButtonTextColor} />
               ) : (
-                <ThemedText style={[styles.buttonText, { color: '#fff' }]}>
+                <ThemedText style={[styles.buttonText, { color: primaryButtonTextColor }]}>
                   Create Account
                 </ThemedText>
               )}
@@ -258,4 +263,3 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
-
