@@ -32,14 +32,14 @@ export default function LoginScreen() {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase?.auth.signInWithPassword?. ({  
         email,
         password,
-      });
+      }) ?? { data: null, error: null };
 
-      if (error) throw error;
+      if (error ?? false) throw error;
 
-      if (data.session) {
+      if (data?.session ?? false) {
         router.replace('/(tabs)');
       }
     } catch (error: any) {

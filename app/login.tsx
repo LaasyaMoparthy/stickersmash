@@ -144,7 +144,7 @@ export default function LoginScreen() {
                 </ThemedText>
               </ThemedText>
             </TouchableOpacity>
-
+            
             <TouchableOpacity
               style={styles.linkButton}
               onPress={() => router.back()}

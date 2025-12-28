@@ -43,13 +43,14 @@ export default function SignupScreen() {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { data, error } = await supabase?.auth.signUp?. ({  
         email,
         password,
-      });
-
-      if (error) throw error;
-
+      }) ?? { data: null, error: null };
+      if (error ?? false) throw error;  
+      if (data?.session ?? false) {
+        router.replace('/(tabs)');
+      }
       Alert.alert(
         'Success',
         'Account created! Please check your email to verify your account.',
